@@ -1,8 +1,6 @@
 export async function fetchVideoInfo(url) {
   try {
-    const response = await fetch(
-      `https://vsaldios.onrender.com/info?url=${url}`
-    );
+    const response = await fetch(`/info?url=${url}`);
 
     if (!response.ok) {
       console.error({ error: "Failed to fetch video information" });

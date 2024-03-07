@@ -6,16 +6,6 @@
   font-family: "Poppins", sans-serif;
 }
 
-:root {
-  --blue-300: #2a4d9d;
-  --blue-500: #253b70;
-  --white: #fff;
-  --gray-200: #f1f1f7;
-  --gray-300: #ccc;
-  --gray-400: #b3b3b3;
-  --gray-800: #373737;
-}
-
 body {
   display: flex;
   align-items: center;
@@ -125,10 +115,8 @@ body {
 .details {
   display: none;
 }
-
 .details .description {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
+  display: block;
   overflow: hidden;
   max-height: 100px;
   text-overflow: ellipsis;
@@ -187,31 +175,9 @@ body {
   text-align: center;
 }
 
-@media screen and (max-width: 460px) {
-  body {
-    padding: 0 20px;
-  }
-  .container {
-    width: 100%;
-  }
-  .container header {
-    font-size: 24px;
-  }
-  .url-input .field {
-    height: 45px;
-  }
-  .preview-area {
-    height: 130px;
-  }
-  .preview-area .icon {
-    font-size: 50px;
-  }
-  .preview-area span {
-    margin-top: 10px;
-    font-size: 12px;
-  }
-
-  .details h3 {
-    font-size: 1;
-  }
+.feedback {
+  font-size: 14px;
+  color: #7c1616;
+  margin-top: 0.5rem;
+  display: none;
 }

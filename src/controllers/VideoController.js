@@ -17,7 +17,7 @@ export class VideoController {
       res.json(info);
     } catch (error) {
       console.error("Erro na busca de informações sobre o vídeo", error);
-      res.status(500).json(error.message);
+      res.status(500).json({ error: error.message });
     }
   }
 

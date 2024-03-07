@@ -26,7 +26,7 @@ O VSaldios foi construído usando as seguintes tecnologias:
 
 - Node.js e npm instalados localmente.
 
-## Instalação do Backend
+## Instalação
 
 1. Clone o repositório:
 
@@ -37,7 +37,7 @@ O VSaldios foi construído usando as seguintes tecnologias:
 2. Instale as dependências:
 
    ```bash
-   cd vsaldios/server
+   cd vsaldios
    npm install
    ```
 
@@ -48,28 +48,6 @@ O VSaldios foi construído usando as seguintes tecnologias:
    ```
 
 4. Acesse o servidor em `http://localhost:3333`.
-
-## Instalação do Frontend
-
-1. Navegue até o diretório do frontend:
-
-   ```bash
-   cd vsaldios/web
-   ```
-
-2. Instale as dependências do frontend:
-
-   ```bash
-   npm install
-   ```
-
-3. Inicie o servidor local para o frontend usando BrowserSync:
-
-   ```bash
-   npm start
-   ```
-
-4. O aplicativo estará disponível em `http://localhost:3000` por padrão.
 
 ## Tecnologias Utilizadas
 

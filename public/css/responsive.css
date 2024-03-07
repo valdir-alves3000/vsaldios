@@ -1,0 +1,28 @@
+@media screen and (max-width: 460px) {
+  body {
+    padding: 0 20px;
+  }
+  .container {
+    width: 100%;
+  }
+  .container header {
+    font-size: 24px;
+  }
+  .url-input .field {
+    height: 45px;
+  }
+  .preview-area {
+    height: 130px;
+  }
+  .preview-area .icon {
+    font-size: 50px;
+  }
+  .preview-area span {
+    margin-top: 10px;
+    font-size: 12px;
+  }
+
+  .details h3 {
+    font-size: 1;
+  }
+}

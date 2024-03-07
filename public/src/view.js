@@ -6,9 +6,12 @@ export class View {
   #videos = document.querySelector(".details .videos");
   #description = document.querySelector(".description");
   #urlField = document.querySelector(".field input");
-  #baseURL = "https://vsaldios.onrender.com";
+  #loading = document.querySelector(".loading-container");
+  #feedback = document.querySelector(".feedback");
 
   updatePreviewArea(iframeUrl, formats, description) {
+    if (!iframeUrl) return this.showFeedback();
+
     this.#previewArea.classList.add("active");
     this.#details.classList.add("active");
     this.#description.textContent = description;
@@ -66,7 +69,7 @@ export class View {
     return iconDownload;
   }
 
-  #createDownloadLink(format) {
+  #createDownloadLink(format, url) {
     const link = document.createElement("a");
 
     const sizeFile = this.#calculateFileSize(
@@ -75,9 +78,7 @@ export class View {
     );
     const bitrate = `${Math.ceil(format.bitrate / 1000)} kbps`;
 
-    link.href = `${this.#baseURL}/download?url=${this.#urlField.value}&format=${
-      format.indexFormat
-    }`;
+    link.href = `/download?url=${url}&format=${format.indexFormat}`;
     link.appendChild(this.#createSpanElement(format.container.toUpperCase()));
     link.appendChild(this.#createSpanElement(format.qualityLabel || bitrate));
     link.appendChild(this.#createSpanElement(sizeFile));
@@ -86,8 +87,8 @@ export class View {
     return link;
   }
 
-  #createListItem(format) {
-    const link = this.#createDownloadLink(format);
+  #createListItem(format, url) {
+    const link = this.#createDownloadLink(format, url);
     const li = document.createElement("li");
     li.appendChild(link);
     return li;
@@ -99,12 +100,33 @@ export class View {
   }
 
   #createElementFormatVideo(format) {
-    const li = this.#createListItem(format);
-    li.addEventListener("click", () => {
-      this.#removeDownloadLinks();
-      this.#urlField.value = "";
-    });
+    const li = this.#createListItem(format, this.#urlField.value);
+    li.addEventListener("click", () => this.#clearDetails());
 
     return li;
+  }
+
+  #clearDetails() {
+    this.#removeDownloadLinks();
+    this.#urlField.value = "";
+    this.showLoading();
+    setTimeout(() => {
+      this.hiddenLoading();
+    }, 3000);
+  }
+
+  showLoading() {
+    this.#loading.style.display = "flex";
+  }
+  hiddenLoading() {
+    this.#loading.style.display = "none";
+  }
+
+  showFeedback() {
+    this.#feedback.style.display = "block";
+  }
+
+  hiddenFeedback() {
+    this.#feedback.style.display = "none";
   }
 }

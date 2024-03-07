@@ -13,11 +13,20 @@ async function handleUrlInput(event) {
   if (!isYouTubeUrl(event.target.value)) {
     return;
   }
-  const { iframeUrl, formats, description } = await fetchVideoInfo(
-    event.target.value
-  );
 
-  view.updatePreviewArea(iframeUrl, formats, description);
+  view.hiddenFeedback();
+  view.showLoading();
+  try {
+    const { iframeUrl, formats, description } = await fetchVideoInfo(
+      event.target.value
+    );
+
+    view.updatePreviewArea(iframeUrl, formats, description);
+  } catch (error) {
+    view.showFeedback();
+  } finally {
+    view.hiddenLoading();
+  }
 }
 
 export { handleUrlInput };

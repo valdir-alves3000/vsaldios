@@ -13,11 +13,12 @@ export class VideoService {
         iframeUrl: videoDetails.embed.iframeUrl,
         formats: formats.map((format, index) => {
           const mimeType = format.mimeType.split(";")[0];
+          const qualityLabel = format.quality.startsWith("hd")
+            ? format.qualityLabel + " HD"
+            : format.qualityLabel;
 
           return {
-            qualityLabel: format.quality.startsWith("hd")
-              ? format.qualityLabel + " HD"
-              : format.qualityLabel,
+            qualityLabel,
             indexFormat: index,
             mimeType,
             bitrate: format.bitrate,
@@ -46,7 +47,7 @@ export class VideoService {
       };
     } catch (error) {
       console.error(error);
-      return error;
+      throw new Error("Video não localizado");
     }
   }
 
