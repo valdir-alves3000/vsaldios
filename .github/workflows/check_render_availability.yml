@@ -1,0 +1,21 @@
+name: Check Render App Availability
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+jobs:
+  check-availability:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Verificar disponibilidade da aplicação no Render
+        run: |
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" https://vsaldios.onrender.com)
+          if [ "$RESPONSE" -eq 200 ]; then
+            echo "Aplicação disponível e respondendo com status 200."
+          else
+            echo "Aplicação indisponível ou respondeu com status $RESPONSE."
+            exit 1
+          fi
