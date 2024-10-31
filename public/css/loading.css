@@ -7,12 +7,23 @@
 }
 
 .loading-spinner {
-  border: 8px solid rgba(0, 0, 0, 0.1);
-  border-left-color: var(--blue-300);
-  border-radius: 50%;
+  position: relative;
   width: 50px;
   height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(90deg, #2b3a8c, #ddd, #9b51e0);
   animation: spin 1s linear infinite;
+}
+
+.loading-spinner::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  right: 6px;
+  bottom: 6px;
+  background-color: #fff;
+  border-radius: 50%;
 }
 
 @keyframes spin {

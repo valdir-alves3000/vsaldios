@@ -89,9 +89,12 @@ body {
 }
 .preview-area.active {
   border: none;
+  box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.2), -4px -4px 16px rgba(0, 0, 0, 0.2);
 }
+
 .preview-area .thumbnail {
   width: 100%;
+  height: 100%;
   display: none;
   border-radius: 5px;
 }
@@ -147,7 +150,7 @@ body {
   list-style: none;
 }
 
-.details ul li a {
+.details ul li div {
   width: 100%;
   height: 40px;
   text-decoration: none;
@@ -155,6 +158,7 @@ body {
   justify-content: space-evenly;
   align-items: center;
   color: var(--blue-300);
+  cursor: pointer;
 }
 
 .details ul:hover li {
@@ -180,4 +184,25 @@ body {
   color: #7c1616;
   margin-top: 0.5rem;
   display: none;
+}
+
+.download-link {
+  width: 100%;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  margin-top: 2rem;
+  text-decoration: none;
+  color: var(--gray-200);
+  padding: 8px 16px;
+  font-weight: bold;
+  border-radius: 5px;
+  text-transform: capitalize;
+  letter-spacing: 2px;
+  background: linear-gradient(90deg, #1f2b6e, #6d3aa6);
+  transition: background 0.5s ease;
+}
+
+.download-link:hover {
+  background: linear-gradient(90deg, #2b3a8c, #9b51e0);
 }
