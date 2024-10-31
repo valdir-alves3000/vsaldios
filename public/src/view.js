@@ -1,3 +1,5 @@
+import { fetchVideoDownload } from "./fetchVideo.js";
+
 export class View {
   #previewArea = document.querySelector(".preview-area");
   #thumbnail = document.querySelector(".thumbnail");
@@ -8,6 +10,7 @@ export class View {
   #urlField = document.querySelector(".field input");
   #loading = document.querySelector(".loading-container");
   #feedback = document.querySelector(".feedback");
+  #downloadLink = document.querySelector(".download-link");
 
   updatePreviewArea(iframeUrl, formats, description) {
     if (!iframeUrl) return this.showFeedback();
@@ -50,16 +53,8 @@ export class View {
     return span;
   }
 
-  #calculateFileSize(bitrate, approxDurationMs) {
-    const sizeInMB = (
-      (bitrate * approxDurationMs) /
-      8 /
-      1024 /
-      1024 /
-      1000
-    ).toFixed(2);
-
-    return `${sizeInMB} MB`;
+  #sizeToMB(size) {
+    return `${(size / 1024 / 1024).toFixed(2)} MB`;
   }
 
   #createDownloadIcon() {
@@ -69,50 +64,43 @@ export class View {
     return iconDownload;
   }
 
-  #createDownloadLink(format, url) {
-    const link = document.createElement("a");
+  #createDownloadDiv(format) {
+    const div = document.createElement("div");
 
-    const sizeFile = this.#calculateFileSize(
-      format.bitrate,
-      format.approxDurationMs
-    );
-    const bitrate = `${Math.ceil(format.bitrate / 1000)} kbps`;
+    div.appendChild(this.#createSpanElement(format.mimeType.toUpperCase()));
+    div.appendChild(this.#createSpanElement(format.qualityLabel));
+    div.appendChild(this.#createSpanElement(this.#sizeToMB(format.size)));
+    div.appendChild(this.#createDownloadIcon());
 
-    link.href = `/download?url=${url}&format=${format.indexFormat}`;
-    link.appendChild(this.#createSpanElement(format.container.toUpperCase()));
-    link.appendChild(this.#createSpanElement(format.qualityLabel || bitrate));
-    link.appendChild(this.#createSpanElement(sizeFile));
-    link.appendChild(this.#createDownloadIcon());
-
-    return link;
+    return div;
   }
 
   #createListItem(format, url) {
-    const link = this.#createDownloadLink(format, url);
+    const div = this.#createDownloadDiv(format);
     const li = document.createElement("li");
-    li.appendChild(link);
+    li.appendChild(div);
     return li;
   }
 
-  #removeDownloadLinks() {
-    const downloadLinks = this.#details.querySelectorAll("ul");
-    downloadLinks.forEach((ul) => (ul.innerHTML = ""));
-  }
-
   #createElementFormatVideo(format) {
+    const url = this.#urlField.value;
     const li = this.#createListItem(format, this.#urlField.value);
-    li.addEventListener("click", () => this.#clearDetails());
+    li.addEventListener("click", async () => {
+      this.#clearDetails();
+      const { filename } = await fetchVideoDownload(url, format.formatID);
+      if (filename) {
+        this.hiddenLoading();
+        this.#showDownloadSelectedFile(filename);
+      }
+    });
 
     return li;
   }
 
   #clearDetails() {
-    this.#removeDownloadLinks();
+    this.removeDownloadLinks();
     this.#urlField.value = "";
     this.showLoading();
-    setTimeout(() => {
-      this.hiddenLoading();
-    }, 3000);
   }
 
   showLoading() {
@@ -128,5 +116,25 @@ export class View {
 
   hiddenFeedback() {
     this.#feedback.style.display = "none";
+  }
+
+  hiddenDownloadSelectedFile() {
+    this.#downloadLink.style.display = "none";
+  }
+
+  #showDownloadSelectedFile(filename) {
+    const href = `/video?filename=${filename}`;
+    this.#downloadLink.setAttribute("href", href);
+    this.#downloadLink.style.display = "flex";
+    this.#downloadLink.addEventListener("click", () =>
+      setTimeout(() => {
+        this.hiddenDownloadSelectedFile();
+      }, 100)
+    );
+  }
+
+  removeDownloadLinks() {
+    const downloadLinks = this.#details.querySelectorAll("ul");
+    downloadLinks.forEach((ul) => (ul.innerHTML = ""));
   }
 }
