@@ -55,7 +55,7 @@ O VSaldios foi construído usando as seguintes tecnologias:
 
 - Node.js
 - Express.js
-- ytdl-core
+- yt-dlp-exec
 - HTML
 - CSS
 
