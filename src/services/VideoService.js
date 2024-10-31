@@ -1,44 +1,54 @@
 import fs from "node:fs";
 import path from "node:path";
-import ytdl from "ytdl-core";
+import ytdlp from "yt-dlp-exec";
 import { FOLDER } from "../../config.js";
+
+const { exec } = ytdlp;
+
+function generateID() {
+  return Math.floor(Math.random() * (99999 - 10000) + 10000);
+}
 
 export class VideoService {
   async getVideoInfo(url) {
     try {
-      const { formats, videoDetails } = await ytdl.getInfo(url);
+      const { stdout } = await exec([url, "--dump-json"]);
+      const videoDetails = JSON.parse(stdout);
 
       const result = {
-        description: videoDetails.description,
-        iframeUrl: videoDetails.embed.iframeUrl,
-        formats: formats.map((format, index) => {
-          const mimeType = format.mimeType.split(";")[0];
-          const qualityLabel = format.quality.startsWith("hd")
-            ? format.qualityLabel + " HD"
-            : format.qualityLabel;
-
+        formats: videoDetails.formats.map((format) => {
           return {
-            qualityLabel,
-            indexFormat: index,
-            mimeType,
-            bitrate: format.bitrate,
-            approxDurationMs: format.approxDurationMs,
-            hasVideo: format.hasVideo,
-            hasAudio: format.hasAudio,
-            container: format.container,
+            abr: format.abr,
+            qualityLabel: format.format_note,
+            formatID: format.format_id,
+            mimeType: format.ext,
+            size: format.filesize_approx,
+            hasVideo: format.vcodec !== "none",
+            hasAudio: format.acodec !== "none",
             url: format.url,
           };
         }),
       };
 
-      const audios = result.formats.filter(
-        (format) => format.hasAudio && !format.hasVideo
-      );
       const videos = result.formats.filter(
         (format) => format.hasVideo && format.hasAudio
       );
 
+      const audioFormats = ["m4a", "mp3"];
+
+      const audios = result.formats
+        .filter(
+          ({ hasAudio, hasVideo, mimeType }) =>
+            hasAudio && !hasVideo && audioFormats.includes(mimeType)
+        )
+        .map((format) => ({
+          ...format,
+          qualityLabel: `${format.abr.toFixed(0)} Kbps`,
+        }));
+
       return {
+        description: videoDetails.description,
+        iframeUrl: videoDetails.thumbnail,
         ...result,
         formats: {
           audios,
@@ -51,60 +61,41 @@ export class VideoService {
     }
   }
 
-  async downloadVideo(url, index) {
-    await this.#clearFolderContents();
+  async downloadVideo(url, formatID) {
     try {
-      const videoInfo = await ytdl.getInfo(url);
-      const videoFormat = videoInfo.formats[index];
-      const videoStrem = ytdl(url, {
-        quality: videoFormat.quality || "highest",
-        format: videoFormat,
-      });
+      const { stdout } = await exec([url, "--dump-json"]);
+      const videoDetails = JSON.parse(stdout);
 
-      const title = videoInfo.videoDetails.title
+      const selectedFormat = videoDetails.formats.find(
+        (format) => format.format_id === formatID
+      );
+
+      if (!selectedFormat) throw new Error("Format not Found!");
+
+      const videoTitle = videoDetails.title
         .replace(/[^\w\sÀ-ÿ]/gi, "")
         .replace(/\s+/g, "-")
         .toLowerCase();
-      const filename = `${title}.${videoFormat.container}`;
-      const mimeType = videoFormat.mimeType.split(";")[0];
 
+      const id = generateID();
+      const filename = `${videoTitle}-${id}.${selectedFormat.ext}`;
       const filePath = path.join(FOLDER, filename);
-      const video = videoStrem.pipe(fs.createWriteStream(filePath));
 
-      videoStrem.on("end", () => {
-        console.log(`Download do vídeo '${filename}' completo.`);
-      });
+      await exec([url, "-f", `${formatID}`, "-o", filePath]);
 
-      videoStrem.on("error", (error) => {
-        console.error("Ocorreu um erro durante o download:", error);
-      });
-
-      return { video, filename, mimeType };
+      console.log(`Download full video '${filename}'.`);
+      return { filename };
     } catch (error) {
-      console.error(error);
+      console.error("Error while downloading:", error);
     }
   }
 
-  async #clearFolderContents() {
-    if (!fs.existsSync(FOLDER)) return this.#createFolder(FOLDER);
-
-    fs.readdir(FOLDER, (err, files) => {
-      if (err) console.error(err);
-      files.forEach((file) => {
-        const fileToDelete = path.join(FOLDER, file);
-        fs.unlink(fileToDelete, (err) => {
-          if (err) {
-            console.error(err);
-            return;
-          }
-        });
-      });
-    });
-  }
-
-  async #createFolder(folder) {
-    fs.mkdir(folder, { recursive: true }, (err) => {
-      if (err) console.error(err);
+  async deleteFile(fileToDelete) {
+    fs.unlink(fileToDelete, (err) => {
+      if (err) {
+        console.error(err);
+        throw new Error("File not found!");
+      }
     });
   }
 
@@ -115,14 +106,12 @@ export class VideoService {
   async getMimeType(file) {
     const ext = file.slice(file.lastIndexOf("."));
     switch (ext) {
-      case ".mp3":
-        return "audio/mp3";
       case ".mp4":
         return "video/mp4";
       case ".webm":
         return "video/webm";
       default:
-        return undefined;
+        return "audio/mp3";
     }
   }
 }
