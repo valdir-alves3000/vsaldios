@@ -1,4 +1,4 @@
-import { fetchVideoInfo } from "./fetchVideoInfo.js";
+import { fetchVideoInfo } from "./fetchVideo.js";
 import { View } from "./view.js";
 
 function isYouTubeUrl(url) {
@@ -16,6 +16,8 @@ async function handleUrlInput(event) {
 
   view.hiddenFeedback();
   view.showLoading();
+  view.hiddenDownloadSelectedFile();
+  view.removeDownloadLinks();
   try {
     const { iframeUrl, formats, description } = await fetchVideoInfo(
       event.target.value

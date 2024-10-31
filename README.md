@@ -1,3 +1,5 @@
+[![Check Render App Availability](https://github.com/valdir-alves3000/vsaldios/workflows/Check%20Render%20App%20Availability/badge.svg)](https://github.com/valdir-alves3000/vsaldios/actions)
+
 # VSaldios
 
 ![preview](./.github/banner.png)
@@ -57,7 +59,7 @@ O VSaldios foi construído usando as seguintes tecnologias:
 - HTML
 - CSS
 
-Vamos ver como ficou o projeto? Acesse e Confira --> [VSaldios](https://vsaldios.onrender.com/)
+Vamos ver como ficou o projeto? Acesse e Confira → [VSaldios](https://vsaldios.onrender.com/)
 
 ### Observações
 
